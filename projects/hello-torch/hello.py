@@ -15,9 +15,6 @@ from dataset import ImageDataset
 
 import model
 
-
-import matplotlib.pyplot as plt
-
 from torch.utils.data import DataLoader
 
 dataset = ImageDataset(device = device,chunkSize=8)
@@ -31,11 +28,13 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 epochs = 10
 for epoch in range(epochs):
     running_loss = 0.0
-    for i, data in enumerate(train_dataloader):
-        data = data.to(device).unsqueeze(1).float()
+    for i, data in enumerate(train_dataloader, 0):
+        inputs, labels = data
+        inputs = inputs.to(device).float()
+        labels = labels.to(device).float().unsqueeze(1)
         optimizer.zero_grad()
-        outputs = model(data)
-        loss = criterion(outputs, data)
+        outputs = model(inputs)
+        loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
